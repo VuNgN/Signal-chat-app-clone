@@ -1,23 +1,78 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { auth } from "../../firebase";
-import { Button } from "react-native-elements";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { auth, db } from "../../firebase";
+import { Avatar, Button } from "react-native-elements";
 import { signOut } from "firebase/auth";
+import CustomListItem from "../custom/CustomListItem";
+import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
+import { collection, onSnapshot } from "firebase/firestore";
 
 const HomeScreen = ({ navigation }) => {
+  const [chats, setChats] = useState([]);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Signal",
+      headerStyle: { backgroundColor: "white" },
+      headerTitleStyle: { color: "black" },
+      headerTintColor: "black",
+      headerLeft: () => (
+        <View style={{ marginLeft: 20 }}>
+          <TouchableOpacity activeOpacity={0.5} onPress={() => signOut(auth)}>
+            <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
+          </TouchableOpacity>
+        </View>
+      ),
+      headerRight: () => (
+        <View style={styles.headerRight}>
+          <TouchableOpacity activeOpacity={0.5}>
+            <AntDesign name="camerao" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate("AddChatScreen")}
+          >
+            <SimpleLineIcons name="pencil" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation]);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "chats"), (docSnap) => {
+      setChats(
+        docSnap.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+    return unsubscribe;
+  }, []);
   return (
-    <View>
-      <Text>{auth.currentUser.displayName}</Text>
-      <Button
-        title="log out"
-        onPress={() => {
-          signOut(auth);
-        }}
-      />
-    </View>
+    <SafeAreaView>
+      <ScrollView>
+        {chats.map(({ id, data: { chatName } }) => (
+          <CustomListItem key={id} id={id} chatName={chatName} />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  headerRight: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: 80,
+    marginRight: 20,
+  },
+});

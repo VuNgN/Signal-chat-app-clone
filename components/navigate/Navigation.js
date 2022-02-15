@@ -5,9 +5,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
-const Stack = createStackNavigator();
 import { auth } from "../../firebase";
+import AddChatScreen from "../screens/AddChatScreen";
 
+const Stack = createStackNavigator();
 export default function Navigation() {
   const [isLogged, setIsLogged] = useState(false);
   const globalScreenOptions = {
@@ -29,7 +30,10 @@ export default function Navigation() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={globalScreenOptions}>
         {isLogged ? (
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="AddChatScreen" component={AddChatScreen} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />

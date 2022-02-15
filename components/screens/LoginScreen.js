@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,10 +10,36 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Image } from "react-native-elements";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const LoginScreen = ({ navigation }) => {
+  const isMounted = useRef(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const login = () => {
+    if (isMounted.current)
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {})
+        .catch(() => {
+          Alert.alert(
+            "Đăng nhập thất bại",
+            "Tài khoản hoặc mật khẩu không chính xác",
+            [
+              {
+                text: "OK",
+                onPress: () => console.log("ok pressed"),
+              },
+            ]
+          );
+          setIsLoading(false);
+        });
+  };
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -40,8 +66,13 @@ const LoginScreen = ({ navigation }) => {
               secureTextEntry
               type="Password"
               onChangeText={(text) => setPassword(text)}
+              onSubmitEditing={login}
             />
-            <Button containerStyle={styles.button} title="Login" />
+            <Button
+              containerStyle={styles.button}
+              title="Login"
+              onPress={login}
+            />
             <Button
               containerStyle={styles.button}
               title="Register"
