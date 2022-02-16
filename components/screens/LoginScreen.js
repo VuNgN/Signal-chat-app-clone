@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { StyleSheet, View, Alert, ActivityIndicator } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Image } from "react-native-elements";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -17,8 +10,11 @@ const LoginScreen = ({ navigation }) => {
   const isMounted = useRef(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const login = () => {
-    if (isMounted.current)
+    isMounted.current = true;
+    if (isMounted.current) {
+      setIsLoading(true);
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {})
         .catch(() => {
@@ -28,12 +24,12 @@ const LoginScreen = ({ navigation }) => {
             [
               {
                 text: "OK",
-                onPress: () => console.log("ok pressed"),
+                onPress: () => setIsLoading(false),
               },
             ]
           );
-          setIsLoading(false);
         });
+    }
   };
   useEffect(() => {
     return () => {
@@ -41,48 +37,41 @@ const LoginScreen = ({ navigation }) => {
     };
   }, []);
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <StatusBar style="light" />
-          <Image
-            source={{
-              uri: "https://blog.mozilla.org/internetcitizen/files/2018/08/signal-logo.png",
-            }}
-            style={{ width: 200, height: 200 }}
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <Image
+          source={require("../../assets/signal-logo.png")}
+          style={{ width: 200, height: 200 }}
+        />
+        <View style={styles.inputContainer}>
+          <Input
+            placeholder="Email"
+            type="Email"
+            keyboardType="email-address"
+            onChangeText={(text) => setEmail(text)}
           />
-          <View style={styles.inputContainer}>
-            <Input
-              placeholder="Email"
-              autoFocus
-              type="Email"
-              onChangeText={(text) => setEmail(text)}
-            />
-            <Input
-              placeholder="Password"
-              secureTextEntry
-              type="Password"
-              onChangeText={(text) => setPassword(text)}
-              onSubmitEditing={login}
-            />
-            <Button
-              containerStyle={styles.button}
-              title="Login"
-              onPress={login}
-            />
-            <Button
-              containerStyle={styles.button}
-              title="Register"
-              type="outline"
-              onPress={() => navigation.navigate("Register")}
-            />
-          </View>
+          <Input
+            placeholder="Password"
+            secureTextEntry
+            type="Password"
+            onChangeText={(text) => setPassword(text)}
+            onSubmitEditing={login}
+          />
+          <Button
+            containerStyle={styles.button}
+            title={isLoading ? <ActivityIndicator color="white" /> : "Login"}
+            onPress={login}
+          />
+          <Button
+            containerStyle={styles.button}
+            title="Register"
+            type="outline"
+            onPress={() => navigation.navigate("Register")}
+          />
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 

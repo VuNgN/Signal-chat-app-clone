@@ -8,7 +8,7 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 
 const CustomListItem = ({ id, chatName, enterChat }) => {
   const [chatMessages, setChatMessages] = useState([]);
@@ -30,15 +30,17 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
       <Avatar
         rounded
         source={{
-          uri:
-            chatMessages?.[0]?.photoURL ||
-            "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+          uri: chatMessages[0]
+            ? chatMessages?.[0]?.photoURL
+            : auth.currentUser.photoURL,
         }}
       />
       <ListItem.Content>
         <ListItem.Title style={styles.listItemTitle}>{chatName}</ListItem.Title>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          {chatMessages?.[0]?.displayName} : {chatMessages?.[0]?.message}
+          {chatMessages[0]
+            ? `${chatMessages?.[0]?.displayName} : ${chatMessages?.[0]?.message}`
+            : "New chat room"}
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>

@@ -1,14 +1,13 @@
 import {
   StyleSheet,
-  Text,
   View,
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { auth, db } from "../../firebase";
-import { Avatar, Button } from "react-native-elements";
+import { Avatar } from "react-native-elements";
 import { signOut } from "firebase/auth";
 import CustomListItem from "../custom/CustomListItem";
 import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";

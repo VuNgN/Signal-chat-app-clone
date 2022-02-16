@@ -5,6 +5,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { Button, Input } from "react-native-elements";
@@ -14,14 +15,16 @@ import { addDoc, collection } from "firebase/firestore";
 
 const AddChatScreen = ({ navigation }) => {
   const [chatName, setChatName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const createNewChat = async () => {
+    setIsLoading(true);
     await addDoc(collection(db, "chats"), {
       chatName: chatName,
     })
       .then(() => {
         navigation.goBack();
       })
-      .catch((err) => alert(err));
+      .catch((err) => setIsLoading(false));
   };
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -51,7 +54,16 @@ const AddChatScreen = ({ navigation }) => {
             }
             onSubmitEditing={createNewChat}
           />
-          <Button onPress={createNewChat} title="Create new chat" />
+          <Button
+            onPress={createNewChat}
+            title={
+              isLoading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                "Create new chat"
+              )
+            }
+          />
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

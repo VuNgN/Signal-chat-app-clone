@@ -11,7 +11,7 @@ import {
   ScrollView,
   TextInput,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Avatar } from "react-native-elements";
 import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
@@ -29,6 +29,7 @@ import { auth, db } from "../../firebase";
 const ChatScreen = ({ navigation, route }) => {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
+  const scrollViewRef = useRef();
   const sendMessage = () => {
     Keyboard.dismiss();
     const chatCollection = doc(db, "chats", route.params.id);
@@ -46,7 +47,7 @@ const ChatScreen = ({ navigation, route }) => {
     const unsubscribe = onSnapshot(
       query(
         collection(chatCollection, "messages"),
-        orderBy("timestamp", "desc")
+        orderBy("timestamp", "asc")
       ),
       (docSnap) => {
         setMessages(
@@ -69,7 +70,7 @@ const ChatScreen = ({ navigation, route }) => {
           <Avatar
             rounded
             source={{
-              uri: messages[0]?.data?.photoURL,
+              uri: messages?.[messages.length - 1]?.data?.photoURL,
             }}
           />
           <Text style={styles.headerTitleText}>{route.params.chatName}</Text>
@@ -102,11 +103,17 @@ const ChatScreen = ({ navigation, route }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
-        keyboardVerticalOffset={90}
+        keyboardVerticalOffset={70}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
+            <ScrollView
+              contentContainerStyle={{ paddingTop: 15 }}
+              ref={scrollViewRef}
+              onContentSizeChange={() =>
+                scrollViewRef.current.scrollToEnd({ animated: true })
+              }
+            >
               {messages.map(({ id, data }, index) =>
                 data.email === auth.currentUser.email ? (
                   <View key={id} style={styles.reciever}>
