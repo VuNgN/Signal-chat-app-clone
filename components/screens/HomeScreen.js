@@ -16,6 +16,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 
 const HomeScreen = ({ navigation }) => {
   const [chats, setChats] = useState([]);
+  const enterChat = (id, chatName) => {
+    navigation.navigate("ChatScreen", {
+      id,
+      chatName,
+    });
+  };
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Signal",
@@ -57,9 +63,14 @@ const HomeScreen = ({ navigation }) => {
   }, []);
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView style={styles.container}>
         {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem key={id} id={id} chatName={chatName} />
+          <CustomListItem
+            key={id}
+            id={id}
+            chatName={chatName}
+            enterChat={enterChat}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -74,5 +85,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: 80,
     marginRight: 20,
+  },
+  container: {
+    height: "100%",
   },
 });

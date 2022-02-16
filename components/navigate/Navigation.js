@@ -7,6 +7,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
 import { auth } from "../../firebase";
 import AddChatScreen from "../screens/AddChatScreen";
+import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createStackNavigator();
 export default function Navigation() {
@@ -33,6 +34,7 @@ export default function Navigation() {
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="AddChatScreen" component={AddChatScreen} />
+            <Stack.Screen name="ChatScreen" component={ChatScreen} />
           </>
         ) : (
           <>

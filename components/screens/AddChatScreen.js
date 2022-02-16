@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { Button, Input } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -23,24 +30,31 @@ const AddChatScreen = ({ navigation }) => {
     });
   }, [navigation]);
   return (
-    <View style={styles.container}>
-      <Input
-        placeholder="Enter a chat name"
-        value={chatName}
-        onChangeText={(text) => setChatName(text)}
-        leftIcon={
-          <Icon
-            name="wechat"
-            type="antdesign"
-            size={24}
-            color="black"
-            style={{ marginRight: 10 }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View>
+          <Input
+            placeholder="Enter a chat name"
+            value={chatName}
+            onChangeText={(text) => setChatName(text)}
+            leftIcon={
+              <Icon
+                name="wechat"
+                type="antdesign"
+                size={24}
+                color="black"
+                style={{ marginRight: 10 }}
+              />
+            }
+            onSubmitEditing={createNewChat}
           />
-        }
-        onSubmitEditing={createNewChat}
-      />
-      <Button onPress={createNewChat} title="Create new chat" />
-    </View>
+          <Button onPress={createNewChat} title="Create new chat" />
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -26,7 +26,7 @@ const RegisterScreen = ({ navigation }) => {
           displayName: fullName,
           photoURL:
             imageUrl ||
-            "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+            "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-portrait-176256935.jpg",
         });
       })
       .catch((error) => alert(error.message));
