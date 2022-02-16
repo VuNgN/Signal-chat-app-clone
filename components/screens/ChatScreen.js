@@ -13,19 +13,52 @@ import {
 } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { Avatar } from "react-native-elements";
-import {
-  AntDesign,
-  SimpleLineIcons,
-  FontAwesome,
-  Ionicons,
-} from "@expo/vector-icons";
+import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { auth, db } from "../../firebase";
 
 const ChatScreen = ({ navigation, route }) => {
   const [text, setText] = useState("");
+  const [messages, setMessages] = useState([]);
   const sendMessage = () => {
     Keyboard.dismiss();
+    const chatCollection = doc(db, "chats", route.params.id);
+    addDoc(collection(chatCollection, "messages"), {
+      timestamp: serverTimestamp(),
+      message: text,
+      displayName: auth.currentUser.displayName,
+      email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL,
+    });
+    setText("");
   };
+  useLayoutEffect(() => {
+    const chatCollection = doc(db, "chats", route.params.id);
+    const unsubscribe = onSnapshot(
+      query(
+        collection(chatCollection, "messages"),
+        orderBy("timestamp", "desc")
+      ),
+      (docSnap) => {
+        setMessages(
+          docSnap.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data(),
+          }))
+        );
+      }
+    );
+    return unsubscribe;
+  }, [route]);
   useLayoutEffect(() => {
     navigation.setOptions({
       title: route.params.chatName,
@@ -36,7 +69,7 @@ const ChatScreen = ({ navigation, route }) => {
           <Avatar
             rounded
             source={{
-              uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-portrait-176256935.jpg",
+              uri: messages[0]?.data?.photoURL,
             }}
           />
           <Text style={styles.headerTitleText}>{route.params.chatName}</Text>
@@ -62,7 +95,7 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, messages]);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="light" />
@@ -73,7 +106,46 @@ const ChatScreen = ({ navigation, route }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView></ScrollView>
+            <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
+              {messages.map(({ id, data }, index) =>
+                data.email === auth.currentUser.email ? (
+                  <View key={id} style={styles.reciever}>
+                    <Avatar
+                      rounded
+                      size={30}
+                      position="absolute"
+                      bottom={-15}
+                      right={-5}
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -5,
+                      }}
+                      source={{ uri: data.photoURL }}
+                    />
+                    <Text style={styles.recieverText}>{data.message}</Text>
+                  </View>
+                ) : (
+                  <View key={id} style={styles.sender}>
+                    <Avatar
+                      rounded
+                      size={30}
+                      position="absolute"
+                      bottom={-15}
+                      left={-5}
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        left: -5,
+                      }}
+                      source={{ uri: data.photoURL }}
+                    />
+                    <Text style={styles.senderText}>{data.message}</Text>
+                    <Text style={styles.senderName}>{data.displayName}</Text>
+                  </View>
+                )
+              )}
+            </ScrollView>
             <View style={styles.footer}>
               <TextInput
                 placeholder="Signal Message"
@@ -129,5 +201,42 @@ const styles = StyleSheet.create({
     padding: 10,
     color: "grey",
     borderRadius: 30,
+  },
+  reciever: {
+    padding: 15,
+    backgroundColor: "#ECECEC",
+    alignSelf: "flex-end",
+    borderRadius: 20,
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  sender: {
+    padding: 15,
+    backgroundColor: "#2B68E6",
+    alignSelf: "flex-start",
+    borderRadius: 20,
+    marginLeft: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  recieverText: {
+    color: "black",
+    fontWeight: "600",
+    marginLeft: 10,
+  },
+  senderText: {
+    color: "white",
+    fontWeight: "600",
+    marginLeft: 10,
+    marginBottom: 10,
+  },
+  senderName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: "white",
   },
 });
