@@ -1,4 +1,4 @@
-# <p align="center">Signal App Clone</p>
+# <p align="center">Signal App Clone 2022</p>
 <p align="center">
    <img  alt="VuNgN's signal app" src="https://user-images.githubusercontent.com/60380217/154507858-07ebcf35-2936-423e-b8a2-185d3253413d.gif" />
 </p>
