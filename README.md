@@ -18,3 +18,7 @@
 <a href="https://signalapp-d1f31.web.app/">
   <img src="https://img.shields.io/badge/-Firebase deploy-blue?style=for-the-badge&labelColor=blue&logo=firebase&logoColor=orange&link=https://signalapp-d1f31.web.app/" alt="Firebase" />
 </a>
+
+<p align="center">
+           <a href="http://readme-typing-svg.herokuapp.com">    <img  alt="VuNgN's GitHub Stats" src="http://readme-typing-svg.herokuapp.com?font=Pacifico&color=%2300ADB5&center=true&vCenter=true&lines=Nguy%E1%BB%85n+Ng%E1%BB%8Dc+V%C5%A9;Mobile+App+Developer+%F0%9F%92%8E;Nice+to+meet+you+.+.+." />  </a>
+</p>
